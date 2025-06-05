@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/custom.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+</head>
+<body>
+<div th:replace="~{fragments/user_sidebar :: sidebar('profile')}"></div>
+<div th:replace="~{fragments/user_navbar :: navbar('My Profile')}"></div>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="content-header">
+        <h2 class="content-title">My Profile</h2>
+        <p class="content-subtitle">Manage your account information and view your statistics</p>
+    </div>
+
+    <!-- Profile Information -->
+    <div class="profile-container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class='bx bx-user'></i>
+                </div>
+                <div class="profile-info">
+                    <h3 th:text="${annotateur.prenom + ' ' + annotateur.nom}">John Doe</h3>
+                    <p th:text="${annotateur.email}">john.doe@example.com</p>
+                    <span class="profile-role" th:text="${annotateur.role}">ANNOTATEUR</span>
+                </div>
+            </div>
+            
+            <div class="profile-details">
+                <div class="detail-row">
+                    <span class="detail-label">Login:</span>
+                    <span class="detail-value" th:text="${annotateur.login}">johndoe</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">First Name:</span>
+                    <span class="detail-value" th:text="${annotateur.prenom}">John</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Last Name:</span>
+                    <span class="detail-value" th:text="${annotateur.nom}">Doe</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value" th:text="${annotateur.email}">john.doe@example.com</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Card -->
+        <div class="stats-card">
+            <h4>My Statistics</h4>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class='bx bx-task'></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-number" th:text="${totalTasks}">0</span>
+                        <span class="stat-label">Total Tasks</span>
+                    </div>
+                </div>
+                
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class='bx bx-check-circle'></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-number" th:text="${totalAnnotations}">0</span>
+                        <span class="stat-label">Annotations Made</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="profile-actions">
+        <button class="btn btn-primary" onclick="editProfile()">
+            <i class='bx bx-edit'></i>
+            Edit Profile
+        </button>
+        <button class="btn btn-secondary" onclick="changePassword()">
+            <i class='bx bx-lock'></i>
+            Change Password
+        </button>
+    </div>
+</main>
+
+<style>
+.profile-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.profile-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1.5rem;
+}
+
+.profile-avatar i {
+    font-size: 2rem;
+    color: white;
+}
+
+.profile-info h3 {
+    margin: 0 0 0.5rem 0;
+    color: #1f2937;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.profile-info p {
+    margin: 0 0 0.5rem 0;
+    color: #6b7280;
+}
+
+.profile-role {
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: #374151;
+}
+
+.detail-value {
+    color: #6b7280;
+}
+
+.stats-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+}
+
+.stats-card h4 {
+    margin: 0 0 1.5rem 0;
+    color: #1f2937;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.stats-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    background: #f3f4f6;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon i {
+    font-size: 1.5rem;
+    color: #6366f1;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: #6366f1;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5856eb;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+@media (max-width: 768px) {
+    .profile-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .profile-avatar {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .profile-actions {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+function editProfile() {
+    alert('Edit profile functionality would be implemented here');
+}
+
+function changePassword() {
+    alert('Change password functionality would be implemented here');
+}
+</script>
+
+<script src="/js/dashboard.js"></script>
+</body>
+</html>

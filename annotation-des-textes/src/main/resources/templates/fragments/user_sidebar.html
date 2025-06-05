@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<aside th:fragment="sidebar(activeMenu)" class="sidebar" id="sidebar">
+    <div class="sidebar-content">
+        <div class="sidebar-header">
+            <div class="logo-icon">
+                <i class='bx bx-analyse'></i>
+            </div>
+            <div class="logo-text">AnnotaPro</div>
+        </div>
+
+        <nav class="sidebar-menu">
+            <div class="menu-label">Core</div>
+            <a href="/user/home" class="menu-item" th:classappend="${activeMenu == 'dashboard'} ? 'active' : ''">
+                <i class='bx bx-home'></i>
+                <span>Dashboard</span>
+            </a>
+
+            <div class="menu-label">Annotation</div>
+            <a href="/user/tasks" class="menu-item" th:classappend="${activeMenu == 'tasks'} ? 'active' : ''">
+                <i class='bx bx-task'></i>
+                <span>My Tasks</span>
+            </a>
+            <a href="/user/history" class="menu-item" th:classappend="${activeMenu == 'history'} ? 'active' : ''">
+                <i class='bx bx-history'></i>
+                <span>Annotation History</span>
+            </a>
+            <a href="/user/profile" class="menu-item" th:classappend="${activeMenu == 'profile'} ? 'active' : ''">
+                <i class='bx bx-user'></i>
+                <span>My Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-footer-text">AnnotaPro • v2.0</div>
+        </div>
+    </div>
+</aside>
+</body>
+</html>

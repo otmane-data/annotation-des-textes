@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management Overview</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/custom.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <style>
+        .task-overview-container {
+            padding: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .task-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .task-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-expired {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-approaching {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-ontrack {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+
+        .task-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-item i {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-action {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #475569;
+            border: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            margin: 10% auto;
+        }
+
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar('tasks')}"></div>
+<div th:replace="~{fragments/navbar :: navbar('Task Management')}"></div>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="content-header">
+        <h2 class="content-title">Task Management Overview</h2>
+        <p class="content-subtitle">Monitor and manage all annotation tasks</p>
+    </div>
+
+    <div class="task-overview-container">
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="task-card" th:each="entry : ${taskOverviewMap}">
+            <div class="task-header">
+                <h3 class="task-title" th:text="'Task #' + ${entry.value.task.id} + ' - ' + ${entry.value.task.dataset.name}"></h3>
+                <span class="task-status"
+                      th:classappend="${entry.value.deadlineStatus == 'Expired'} ? 'status-expired' : 
+                                     ${entry.value.deadlineStatus == 'Approaching'} ? 'status-approaching' : 'status-ontrack'"
+                      th:text="${entry.value.deadlineStatus}"></span>
+            </div>
+
+            <div class="task-info">
+                <div class="info-item">
+                    <i class='bx bx-user'></i>
+                    <span th:text="${entry.value.task.annotateur.nom}"></span>
+                </div>
+                <div class="info-item">
+                    <i class='bx bx-calendar'></i>
+                    <span th:text="${#dates.format(entry.value.task.dateLimite, 'dd/MM/yyyy')}"></span>
+                </div>
+                <div class="info-item">
+                    <i class='bx bx-check-circle'></i>
+                    <span th:text="${entry.value.totalAnnotations} + ' annotations'"></span>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" th:style="'width: ' + ${entry.value.progress} + '%'"></div>
+            </div>
+            <span th:text="${entry.value.progress} + '% completed'"></span>
+
+            <div class="task-actions">
+                <button class="btn-action btn-primary" onclick="openDeadlineModal(this)" th:data-task-id="${entry.value.task.id}">
+                    <i class='bx bx-calendar-edit'></i> Extend Deadline
+                </button>
+                <button class="btn-action btn-secondary" onclick="openReassignModal(this)" th:data-task-id="${entry.value.task.id}">
+                    <i class='bx bx-transfer'></i> Reassign
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extend Deadline Modal -->
+    <div id="deadlineModal" class="modal">
+        <div class="modal-content">
+            <h3>Extend Deadline</h3>
+            <form id="extendDeadlineForm" method="POST">
+                <div class="form-group">
+                    <label for="newDeadline">New Deadline</label>
+                    <input type="date" id="newDeadline" name="newDeadline" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('deadlineModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reassign Modal -->
+    <div id="reassignModal" class="modal">
+        <div class="modal-content">
+            <h3>Reassign Task</h3>
+            <form id="reassignForm" method="POST">
+                <div class="form-group">
+                    <label for="newAnnotatorId">Select New Annotator</label>
+                    <select id="newAnnotatorId" name="newAnnotatorId" required>
+                        <option value="">Select an annotator</option>
+                        <option th:each="annotator : ${annotateurs}"
+                                th:value="${annotator.id}"
+                                th:text="${annotator.nom}"></option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('reassignModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openDeadlineModal(button) {
+            const taskId = button.getAttribute('data-task-id');
+            const form = document.getElementById('extendDeadlineForm');
+            form.action = `/admin/task-management/${taskId}/extend-deadline`;
+            document.getElementById('deadlineModal').style.display = 'block';
+        }
+
+        function openReassignModal(button) {
+            const taskId = button.getAttribute('data-task-id');
+            const form = document.getElementById('reassignForm');
+            form.action = `/admin/task-management/${taskId}/reassign`;
+            document.getElementById('reassignModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</main>
+
+<script src="/js/dashboard.js"></script>
+</body>
+</html>

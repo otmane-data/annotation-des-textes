@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Advanced Statistics</title>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/custom.css">
+    <link rel="stylesheet" href="/css/advanced_stats.css">
+    <link rel="stylesheet" href="/css/spam_detection.css">
+    <script src="/js/advanced_stats.js" defer></script>
+    <script src="/js/spam_detection.js" defer></script>
+
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar('advanced-stats')}"></div>
+<div th:replace="~{fragments/navbar :: navbar('Advanced Statistics')}"></div>
+
+<!-- Main content container -->
+<div class="main-content">
+    <div class="content-header">
+        <h2 class="content-title">Advanced Statistics</h2>
+        <p class="content-subtitle">Monitor and analyze annotation data and performance metrics</p>
+    </div>
+    
+    <!-- Dataset Selection Section -->
+    <form th:action="@{/admin/metrics-calculate}" method="post" class="dataset-selection">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-database"></i> Dataset Selection</h2>
+                <div class="card-actions">
+                    <button class="btn btn-primary" id="applyDatasetBtn">
+                        <i class="fas fa-check"></i> Apply
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="dataset-filters">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="datasetSelect">Select Dataset:</label>
+                            <select id="datasetSelect" class="dataset-select" name="datasetId">
+                                <option value="">-- Select a dataset --</option>
+                                <!-- Dynamically populate datasets -->
+                                <option th:each="dataset : ${datasets}"
+                                        th:value="${dataset.id}"
+                                        th:text="${dataset.name + ' (' + #lists.size(dataset.coupleTexts) + ' items)'}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dataset-info" th:if="${totalItems != null}">
+                    <div class="info-item">
+                        <span class="info-label">Selected Dataset:</span>
+                        <span class="info-value" id="selectedDatasetInfo" th:text="${selectedDatasetName} ?: '--'">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Total Items:</span>
+                        <span class="info-value" id="totalItemsInfo" th:text="${totalItems}">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Kappa Metrics Section -->
+    <section class="kappa-metrics">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-handshake"></i> Inter-Annotator Agreement Metrics</h2>
+            </div>
+            <div class="card-content">
+                <div class="chart-container">
+                    <canvas id="kappaChart"></canvas>
+                </div>
+                <div class="metrics-table">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Metric Type</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><i class="fas fa-chart-line text-primary"></i> Cohen's Kappa</td>
+                            <td class="score" th:text="${#numbers.formatDecimal(cohenKappa, 1, 'POINT', 2, 'POINT')}">0.82</td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${cohenKappa > 0.75} ? 'status-excellent' : (${cohenKappa > 0.4} ? 'status-good' : 'status-poor')"
+                                      th:text="${cohenKappa > 0.75} ? 'Excellent' : (${cohenKappa > 0.4} ? 'Good' : 'Poor')">
+                                    Excellent
+                                </span>
+                            </td>
+                            <td>Measure of agreement between two annotators</td>
+                        </tr>
+
+                        <tr>
+                            <td><i class="fas fa-chart-bar text-primary"></i> Fleiss' Kappa</td>
+                            <td class="score" th:text="${#numbers.formatDecimal(fleissKappa, 1, 'POINT', 2, 'POINT')}">0.75</td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${fleissKappa > 0.75} ? 'status-excellent' : (${fleissKappa > 0.4} ? 'status-good' : 'status-poor')"
+                                      th:text="${fleissKappa > 0.75} ? 'Excellent' : (${fleissKappa > 0.4} ? 'Good' : 'Poor')">
+                                    Good
+                                </span>
+                            </td>
+                            <td>Measure of agreement between multiple annotators</td>
+                        </tr>
+
+                        <tr>
+                            <td><i class="fas fa-percentage text-primary"></i> Percent Agreement</td>
+                            <td class="score" th:text="${#numbers.formatDecimal(percentAgreement, 1, 'POINT', 2, 'POINT')} + '%'">88%</td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${percentAgreement > 0.75} ? 'status-excellent' : (${percentAgreement > 0.4} ? 'status-good' : 'status-poor')"
+                                      th:text="${percentAgreement > 0.75} ? 'Excellent' : (${percentAgreement > 0.4} ? 'Good' : 'Poor')">
+                                    Excellent
+                                </span>
+                            </td>
+                            <td>Raw percentage of annotations that match</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Spam Detection Section -->
+    <section class="spam-detection">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-shield-alt"></i> Spam Detection System</h2>
+            </div>
+            <div class="card-content">
+                <!-- Service Status -->
+                <div class="service-status-container mb-4">
+                    <h4>Python Service Status</h4>
+                    <div id="pythonServiceStatus" class="service-status">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span>Checking service status...</span>
+                    </div>
+                    <div id="serviceControls" class="mt-2" style="display: none;">
+                        <button id="startServiceBtn" class="btn btn-warning">
+                            <i class="fas fa-play"></i> Start Python Service
+                        </button>
+                        <span id="serviceStartStatus"></span>
+                    </div>
+                </div>
+
+                <!-- Detection Controls -->
+                <div class="detection-controls mb-4">
+                    <h4>Run Spam Detection</h4>
+                    <form id="spamDetectionForm" th:action="@{/admin/spam/detect}" method="post">
+                        <!-- Model Settings Section -->
+                        <div class="model-settings mb-3">
+                            <h5>Model Settings</h5>
+                            <div class="control-row">
+                                <div class="form-group">
+                                    <label for="modelType">NLI Model:</label>
+                                    <select id="modelType" name="modelType" class="form-control">
+                                        <option value="roberta-large-mnli" selected>RoBERTa Large MNLI</option>
+                                        <option value="bart-large-mnli">BART Large MNLI</option>
+                                        <option value="distilbert-base-uncased-mnli">DistilBERT Base MNLI</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="threshold">Default Threshold:</label>
+                                    <div class="input-group">
+                                        <input type="number" id="threshold" name="threshold" 
+                                               class="form-control" step="0.05" min="0" max="1" 
+                                               value="0.3" required>
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                    <small class="form-text">Annotators with mismatch rates above this threshold will be flagged as potential spammers.</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Adding hidden input for all annotators since we're always using that value -->
+                        <input type="hidden" name="annotator_all" value="true">
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="runDetectionBtn">
+                                <i class="fas fa-search"></i> Run Detection
+                            </button>
+                            <div class="detection-status" id="detectionStatus"></div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Results Table -->
+                <div class="results-container">
+                    <h4>Detection Results</h4>
+                    <div th:if="${success}" class="alert alert-success" role="alert" th:text="${success}"></div>
+                    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+                    
+                    <div class="results-summary mb-3" th:if="${results != null && !results.empty}">
+                        <div class="summary-item">
+                            <span class="summary-label">Total Annotators:</span>
+                            <span class="summary-value" th:text="${#lists.size(results)}">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Flagged Annotators:</span>
+                            <span class="summary-value text-danger" th:text="${flaggedCount ?: 0}">0</span>
+                        </div>
+                        <div class="summary-item" th:if="${timestamp}">
+                            <span class="summary-label">Last Run:</span>
+                            <span class="summary-value" th:text="${timestamp}">Never</span>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th>Annotator</th>
+                                <th>Email</th>
+                                <th>Mismatch Rate</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${results == null || results.empty}">
+                                <td colspan="4" class="text-center">No detection results available. Run the detection process to see results.</td>
+                            </tr>
+                            <tr th:each="result : ${results}" th:if="${results != null && !results.empty}">
+                                <td th:text="${result.annotateur.prenom + ' ' + result.annotateur.nom}">John Doe</td>
+                                <td th:text="${result.annotateur.email}">john@example.com</td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar" role="progressbar" 
+                                             th:style="'width: ' + ${result.mismatchRate * 100} + '%;'"
+                                             th:classappend="${result.flagged ? 'bg-danger' : 'bg-success'}"
+                                             th:text="${#numbers.formatDecimal(result.mismatchRate * 100, 1, 2) + '%'}">0%</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${result.flagged ? 'bg-danger' : 'bg-success'}"
+                                          th:text="${result.flagged ? 'Potential Spammer' : 'Normal'}">Normal</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+</div>
+</body>
+</html>

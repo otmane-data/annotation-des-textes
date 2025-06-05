@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataset Details - Annotations App</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/custom.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">   
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dataset_view.css">
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar('datasets')}"></div>
+<div th:replace="~{fragments/navbar :: navbar('Dataset Details')}"></div>
+
+<main class="main-content">
+    <div class="user-header animate-fadeUp">
+        <div class="header-title">
+            <h1>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="36" height="36" style="margin-right: 0.5em; vertical-align: middle; fill: #4A6CF7;">
+                    <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
+                </svg>
+                Dataset Details
+            </h1>
+            <p class="header-subtitle" th:text="'Viewing dataset: ' + ${dataset.name}">Dataset information and text pairs</p>
+        </div>
+
+        <div class="header-actions">
+            <a th:href="@{'/admin/datasets/' + ${dataset.id} + '/assign_annotator'}" class="action-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" style="margin-right: 0.4em; vertical-align: middle; fill: currentColor;">
+                    <path d="M8 12.052c1.995 0 3.5-1.505 3.5-3.5s-1.505-3.5-3.5-3.5-3.5 1.505-3.5 3.5 1.505 3.5 3.5 3.5zM9 13H7c-2.757 0-5 2.243-5 5v1h12v-1c0-2.757-2.243-5-5-5zm11-3h-2v-2h-2v2h-2v2h2v2h2v-2h2v-2z"/>
+                </svg>
+                Assign Annotators
+            </a>
+            <a th:href="@{/admin/datasets}" class="action-btn secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" style="margin-right: 0.4em; vertical-align: middle; fill: currentColor;">
+                    <path d="M21 11H6.414l5.293-5.293-1.414-1.414L2.586 12l7.707 7.707 1.414-1.414L6.414 13H21z"/>
+                </svg>
+                Back to Datasets
+            </a>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages Section -->
+    <div class="message-container animate-fadeUp">
+        <div th:if="${errorMessage}" class="alert alert-error">
+            <i class='bx bx-error-circle'></i>
+            <span th:text="${errorMessage}">Error message</span>
+        </div>
+    </div>
+
+    <!-- Dataset Information Card -->
+    <div class="dataset-card animate-fadeUp">
+        <div class="dataset-card-header">
+            <h2 class="dataset-card-title">
+                <i class='bx bx-info-circle'></i>
+                Dataset Information
+            </h2>
+        </div>
+        <div class="dataset-card-body">
+            <div class="dataset-property">
+                <div class="dataset-property-label">Name</div>
+                <div class="dataset-property-value" th:text="${dataset.name}">Dataset Name</div>
+            </div>
+            <div class="dataset-property">
+                <div class="dataset-property-label">Description</div>
+                <div class="dataset-property-value" th:text="${dataset.description ?: 'No description provided'}">Dataset Description</div>
+            </div>
+            <div class="dataset-property">
+                <div class="dataset-property-label">Total Text Pairs</div>
+                <div class="dataset-property-value">
+                    <span class="dataset-badge" th:text="${coupleTextsPage.totalElements}">0</span>
+                </div>
+            </div>
+            <div class="dataset-property" th:if="${dataset.classesPossibles != null and !dataset.classesPossibles.isEmpty()}">
+                <div class="dataset-property-label">Available Classes</div>
+                <div class="dataset-property-value">
+                    <span th:each="classe : ${dataset.classesPossibles}" class="class-tag" th:text="${classe.textClass}">Class</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Text Pairs Section -->
+    <div class="dataset-card animate-fadeUp">
+        <div class="dataset-card-header">
+            <h2 class="dataset-card-title">
+                <i class='bx bx-text'></i>
+                Text Pairs
+            </h2>
+        </div>
+        <div class="dataset-card-body">
+            <div th:if="${coupleTextsPage.content.isEmpty()}" class="empty-placeholder">
+                <i class='bx bx-file-blank'></i>
+                <p>No text pairs found in this dataset.</p>
+            </div>
+            
+            <div th:unless="${coupleTextsPage.content.isEmpty()}">
+                <table class="text-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Text 1</th>
+                            <th>Text 2</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="couple : ${coupleTextsPage.content}">
+                            <td>
+                                <span class="text-table-id" th:text="${couple.id}">1</span>
+                            </td>
+                            <td>
+                                <div class="text-content-box" th:text="${couple.texte1}">First text content</div>
+                            </td>
+                            <td>
+                                <div class="text-content-box" th:text="${couple.texte2}">Second text content</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- Pagination -->
+                <div class="pagination" th:if="${totalPages > 1}">
+                    <div class="pagination-info">
+                        Showing <span th:text="${coupleTextsPage.numberOfElements}">10</span> of 
+                        <span th:text="${coupleTextsPage.totalElements}">100</span> text pairs
+                    </div>
+                    
+                    <div class="pagination-controls">
+                        <a th:href="@{'/admin/datasets/details/' + ${dataset.id} + '?page=' + ${currentPage - 1}}" 
+                           th:classappend="${currentPage == 0} ? 'disabled' : ''" 
+                           class="pagination-btn">
+                            <i class='bx bx-chevron-left'></i>
+                        </a>
+                        
+                        <span th:each="pageNum : ${#numbers.sequence(startPage, endPage)}" 
+                              th:if="${pageNum >= 0 and pageNum < totalPages}">
+                            <a th:href="@{'/admin/datasets/details/' + ${dataset.id} + '?page=' + ${pageNum}}" 
+                               th:text="${pageNum + 1}"
+                               th:classappend="${pageNum == currentPage} ? 'active' : ''" 
+                               class="pagination-btn">1</a>
+                        </span>
+                        
+                        <a th:href="@{'/admin/datasets/details/' + ${dataset.id} + '?page=' + ${currentPage + 1}}" 
+                           th:classappend="${currentPage >= totalPages - 1} ? 'disabled' : ''" 
+                           class="pagination-btn">
+                            <i class='bx bx-chevron-right'></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- JavaScript for enhanced interactions -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle sidebar functionality
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        if (menuToggle && sidebar) {
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+        }
+        
+        // Add hover effects to action buttons
+        const buttons = document.querySelectorAll('.action-btn');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+            });
+        });
+        
+        // Add fade-in animation to cards
+        const cards = document.querySelectorAll('.dataset-card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+    });
+</script>
+</body>
+</html>

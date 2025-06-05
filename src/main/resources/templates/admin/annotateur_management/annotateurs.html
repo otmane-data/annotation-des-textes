@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Gestion des Annotateurs</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <h1>Gestion des Annotateurs</h1>
+        
+        <!-- Contenu de la page -->
+        <div class="container">
+            <!-- Table des annotateurs -->
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Boucle sur les annotateurs -->
+                    <tr th:each="annotateur : ${annotateurs}">
+                        <td th:text="${annotateur.id}">1</td>
+                        <td th:text="${annotateur.nom}">Nom</td>
+                        <td th:text="${annotateur.email}">email@example.com</td>
+                        <td>
+                            <a th:href="@{/admin/annotateur/edit/{id}(id=${annotateur.id})}" class="btn btn-primary">Modifier</a>
+                            <a th:href="@{/admin/annotateur/delete/{id}(id=${annotateur.id})}" class="btn btn-danger">Supprimer</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Bouton pour ajouter un nouvel annotateur -->
+            <a th:href="@{/admin/annotateur/new}" class="btn btn-success">Ajouter un annotateur</a>
+        </div>
+    </div>
+</body>
+</html> 

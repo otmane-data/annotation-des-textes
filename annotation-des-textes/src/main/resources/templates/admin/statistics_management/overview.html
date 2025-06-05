@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Statistiques et Suivi</title>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js " defer></script>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/custom.css">
+    <link rel="stylesheet" href="/css/statistics.css">
+
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar('statistics')}"></div>
+<div th:replace="~{fragments/navbar :: navbar('Statistiques et Suivi')}"></div>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="content-header">
+        <h2 class="content-title">Statistiques et Suivi</h2>
+        <p class="content-subtitle">Monitor and analyze annotation data and performance metrics</p>
+    </div>
+    
+    
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-card-icon">
+                <i class='bx bx-clipboard'></i>
+            </div>
+            <div th:text="${totalAnnotations}" class="stat-card-value">5,248</div>
+            <div class="stat-card-label">Total Annotations</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon">
+                <i class='bx bx-task'></i>
+            </div>
+            <div th:text="${activeTasks}" class="stat-card-value">12</div>
+            <div class="stat-card-label">Active Tasks</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon">
+                <i class='bx bx-data'></i>
+            </div>
+            <div th:text="${totalDatasets}" class="stat-card-value">8</div>
+            <div class="stat-card-label">Datasets</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon">
+                <i class='bx bx-user'></i>
+            </div>
+            <div th:text="${totalAnnotateurs}" class="stat-card-value">23</div>
+            <div class="stat-card-label">Annotateurs</div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <!-- Progress by Dataset -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title">
+                    <i class='bx bx-bar-chart'></i>
+                    Progress by Dataset
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: rgba(203, 213, 225, 0.7)"></div>
+                        <span>Total</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: rgba(79, 70, 229, 0.7)"></div>
+                        <span>Annotated</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-content">
+                <canvas id="datasetsProgressChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Classification Distribution -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title">
+                    <i class='bx bx-pie-chart-alt-2'></i>
+                    Class Distribution
+                </div>
+            </div>
+            <div class="pie-chart-content">
+                <canvas id="classDistributionChart"></canvas>
+            </div>
+            <div class="chart-footer">
+                <p>Distribution across all datasets</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Annotator Performance -->
+    <div class="annotator-performance">
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title">
+                    <i class='bx bx-user-check'></i>
+                    Annotator Performance
+                </div>
+            </div>
+            <div class="chart-content">
+                <canvas id="annotatorPerformanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="download-section">
+        <div class="section-header">
+            <h3 class="section-title"><i class='bx bx-download'></i> Download Annotations</h3>
+            <p class="section-description">Export annotations with label, text 1, and text 2 columns</p>
+        </div>
+        
+        <div class="dataset-selector">
+            <label for="datasetSelect">Select Dataset:</label>
+            <select id="datasetSelect" class="form-select">
+                <option value="">Select a dataset</option>
+                <option th:each="dataset : ${datasets}"
+                        th:value="${dataset.id}" 
+                        th:text="${dataset.name}"></option>
+            </select>
+        </div>
+        
+        <div class="download-buttons">
+            <button id="excelBtn" class="download-btn excel-btn" disabled>
+                <i class='bx bx-file'></i> Download Excel
+            </button>
+            <button id="csvBtn" class="download-btn csv-btn" disabled>
+                <i class='bx bx-spreadsheet'></i> Download CSV
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2023 Annotations App. All rights reserved.</p>
+            <p>Version 2.0</p>
+        </div>
+    </footer>
+</main>
+
+<!-- JavaScript for Charts -->
+<script id="datasets-data" type="application/json" th:utext="${datasetsProgressJson}"></script>
+<script id="class-data" type="application/json" th:utext="${classDistributionJson}"></script>
+<script id="performance-data" type="application/json" th:utext="${annotatorPerformanceData}"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set Chart.js defaults for all charts
+        Chart.defaults.font.family = "'Poppins', sans-serif";
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.borderColor = '#e5e7eb';
+        
+        // Dataset Progress Chart
+        const datasetsProgressCtx = document.getElementById('datasetsProgressChart').getContext('2d');
+        const datasetsProgress = JSON.parse(document.getElementById('datasets-data').textContent);
+        new Chart(datasetsProgressCtx, {
+            type: 'bar',
+            data: {
+                labels: datasetsProgress.labels,
+                datasets: [
+                    {
+                        label: 'Total Couples',
+                        data: datasetsProgress.totalCouples,
+                        backgroundColor: 'rgba(203, 213, 225, 0.7)',
+                        borderColor: 'rgb(203, 213, 225)',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Annotated',
+                        data: datasetsProgress.annotatedCouples,
+                        backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                        borderColor: 'rgb(79, 70, 229)',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                        padding: 15,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        cornerRadius: 8,
+                        displayColors: true,
+                        boxPadding: 6
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Text Couples',
+                            font: {
+                                size: 13,
+                                weight: 'normal'
+                            },
+                            padding: {top: 10, bottom: 10}
+                        },
+                        grid: {
+                            display: true,
+                            drawBorder: false,
+                            color: 'rgba(229, 231, 235, 0.5)'
+                        },
+                        ticks: {
+                            padding: 10
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Datasets',
+                            font: {
+                                size: 13,
+                                weight: 'normal'
+                            },
+                            padding: {top: 10, bottom: 0}
+                        },
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            padding: 10
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+
+        // Class Distribution Chart
+        const classDistributionCtx = document.getElementById('classDistributionChart').getContext('2d');
+        const classDistributionData =  JSON.parse(document.getElementById('class-data').textContent);
+        new Chart(classDistributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: classDistributionData.labels,
+                datasets: [{
+                    data: classDistributionData.data,
+                    backgroundColor: [
+                        'rgba(79, 70, 229, 0.85)', // Primary
+                        'rgba(16, 185, 129, 0.85)', // Success
+                        'rgba(245, 158, 11, 0.85)', // Warning
+                        'rgba(107, 114, 128, 0.85)' // Neutral
+                    ],
+                    borderColor: [
+                        'rgb(79, 70, 229)',
+                        'rgb(16, 185, 129)',
+                        'rgb(245, 158, 11)',
+                        'rgb(107, 114, 128)'
+                    ],
+                    borderWidth: 2,
+                    hoverOffset: 8,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15,
+                            font: {
+                                size: 12
+                            },
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                        padding: 15,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        cornerRadius: 8,
+                        displayColors: true,
+                        boxPadding: 6
+                    }
+                },
+                cutout: '70%',
+                animation: {
+                    animateScale: true,
+                    animateRotate: true,
+                    duration: 2000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+
+        // Annotator Performance Chart
+        const annotatorPerformanceCtx = document.getElementById('annotatorPerformanceChart').getContext('2d');
+        const annotatorPerformanceData =  JSON.parse(document.getElementById('performance-data').textContent);
+
+        new Chart(annotatorPerformanceCtx, {
+            type: 'bar',
+            data: {
+                labels: annotatorPerformanceData.labels,
+                datasets: [
+                    {
+                        label: 'Completion Rate (%)',
+                        data: annotatorPerformanceData.completionRates,
+                        backgroundColor: function(context) {
+                            const value = context.dataset.data[context.dataIndex];
+                            return value > 90 ? 'rgba(16, 185, 129, 0.8)' : 
+                                  value > 80 ? 'rgba(79, 70, 229, 0.8)' : 
+                                  value > 70 ? 'rgba(245, 158, 11, 0.8)' : 
+                                  'rgba(239, 68, 68, 0.8)';
+                        },
+                        borderColor: function(context) {
+                            const value = context.dataset.data[context.dataIndex];
+                            return value > 90 ? 'rgb(16, 185, 129)' : 
+                                  value > 80 ? 'rgb(79, 70, 229)' : 
+                                  value > 70 ? 'rgb(245, 158, 11)' : 
+                                  'rgb(239, 68, 68)';
+                        },
+                        borderWidth: 2,
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                        padding: 15,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        cornerRadius: 8,
+                        displayColors: true,
+                        boxPadding: 6
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Completion Rate (%)',
+                            font: {
+                                size: 13,
+                                weight: 'normal'
+                            },
+                            padding: {top: 10, bottom: 10}
+                        },
+                        max: 100,
+                        grid: {
+                            display: true,
+                            drawBorder: false,
+                            color: 'rgba(229, 231, 235, 0.5)'
+                        },
+                        ticks: {
+                            padding: 10
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            padding: 10
+                        }
+                    }
+                },
+                animation: {
+                    delay: function(context) {
+                        return context.dataIndex * 150;
+                    },
+                    duration: 1200,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const datasetSelect = document.getElementById('datasetSelect');
+        const excelBtn = document.getElementById('excelBtn');
+        const csvBtn = document.getElementById('csvBtn');
+        
+        datasetSelect.addEventListener('change', function() {
+            const datasetId = this.value;
+            const buttonsEnabled = datasetId !== '';
+            
+            excelBtn.disabled = !buttonsEnabled;
+            csvBtn.disabled = !buttonsEnabled;
+            
+            if (buttonsEnabled) {
+                excelBtn.onclick = function() {
+                    window.location.href = '/admin/download-annotations-excel/' + datasetId;
+                };
+                
+                csvBtn.onclick = function() {
+                    window.location.href = '/admin/download-annotations-csv/' + datasetId;
+                };
+            }
+        });
+    });
+</script>
+</body>
+</html>

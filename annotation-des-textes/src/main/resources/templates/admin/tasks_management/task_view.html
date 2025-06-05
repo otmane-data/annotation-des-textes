@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks Overview</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/custom.css">
+    <link rel="stylesheet" href="/css/admin_task_view.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+</head>
+<body class="bg-light">
+<div th:replace="~{fragments/sidebar :: sidebar('tasks')}"></div>
+<div th:replace="~{fragments/navbar :: navbar('Tasks Overview')}"></div>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="content-header">
+        <div class="header-title">
+            <h1><i class='bx bx-task'></i> Annotation Tasks</h1>
+            <p class="header-subtitle">View and manage all annotation tasks</p>
+        </div>
+
+        <div class="header-actions">
+            <a href="/admin/datasets" class="btn btn-outline-primary">
+                <i class='bx bx-data'></i>
+                Manage Datasets
+            </a>
+            <a href="/admin/datasets/add" class="btn btn-primary">
+                <i class='bx bx-plus'></i>
+                Add Dataset
+            </a>
+        </div>
+    </div>
+
+    <!-- Tasks Grid -->
+    <div class="tasks-container">
+        <div class="tasks-grid">
+            <!-- Task Card -->
+            <div class="task-card" th:each="item : ${tasksWithProgress}">
+                <div class="task-card-header">
+                    <div class="task-id">
+                        <span class="task-badge">Task #<span th:text="${item.task.id}">123</span></span>
+                    </div>
+                    <div class="task-date">
+                        <i class='bx bx-calendar'></i>
+                        <span th:text="${#dates.format(item.task.dateLimite, 'MMM dd, yyyy')}">Oct 15, 2023</span>
+                    </div>
+                </div>
+
+                <div class="task-card-body">
+                    <div class="task-info">
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class='bx bx-user'></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Annotator</span>
+                                <span class="info-value" th:text="${item.annotatorName}">John Doe</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class='bx bx-data'></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Dataset</span>
+                                <span class="info-value" th:text="${item.task.dataset.name}">Product Dataset</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class='bx bx-file'></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Annotations</span>
+                                <span class="info-value">
+                                    <span class="fw-bold" th:text="${item.done}">12</span>
+                                    <span class="text-muted">/ </span>
+                                    <span th:text="${item.total}">50</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="task-progress">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small fw-medium">Progress</span>
+                            <span class="badge" th:classappend="${item.percent >= 80 ? 'bg-success' : (item.percent >= 40 ? 'bg-info' : 'bg-warning')}" th:text="${item.percent + '%'}">24%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" th:style="|width: ${item.percent}%;|">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card-footer">
+                    <a th:href="@{/admin/annotations/{taskId}(taskId=${item.task.id})}" class="view-details-btn">
+                        <i class='bx bx-right-arrow-alt'></i>
+                        <span>View Details</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" th:if="${#lists.isEmpty(tasksWithProgress)}">
+                <div class="empty-state-icon">
+                    <i class='bx bx-task-x'></i>
+                </div>
+                <h3 class="empty-state-title">No Tasks Found</h3>
+                <p class="empty-state-message">No annotation tasks have been created yet. Tasks are automatically generated when you assign annotators to datasets.</p>
+                <div class="empty-state-actions">
+                    <a href="/admin/datasets" class="btn btn-primary mt-3">
+                        <i class='bx bx-data me-2'></i>Manage Datasets
+                    </a>
+                    <a href="/admin/datasets/add" class="btn btn-outline-primary mt-3 ms-2">
+                        <i class='bx bx-plus me-2'></i>Add New Dataset
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-title h1 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 1.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.header-title h1 i {
+    color: #4A6CF7;
+}
+
+.header-subtitle {
+    margin: 0.5rem 0 0 0;
+    color: #64748b;
+    font-size: 1rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.btn-primary {
+    background: #4A6CF7;
+    color: white;
+    border-color: #4A6CF7;
+}
+
+.btn-primary:hover {
+    background: #3b5ce6;
+    border-color: #3b5ce6;
+    transform: translateY(-2px);
+    color: white;
+}
+
+.btn-outline-primary {
+    background: transparent;
+    color: #4A6CF7;
+    border-color: #4A6CF7;
+}
+
+.btn-outline-primary:hover {
+    background: #4A6CF7;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.empty-state-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.empty-state-message {
+    max-width: 400px;
+    margin: 0 auto 1.5rem auto;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .content-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .empty-state-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .empty-state-actions .btn {
+        width: 200px;
+        justify-content: center;
+    }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnnoatPro - Plateforme d'annotation de textes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <style>
+        body {
+            background: #f8fafc;
+            color: #1a202c;
+            font-family: 'Space Grotesk', sans-serif;
+            line-height: 1.6;
+        }
+
+        .main-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .nav-link {
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background: linear-gradient(90deg, #3ec6ff 0%, #64ffda 100%);
+            transition: width 0.3s;
+        }
+
+        .nav-link:hover:after {
+            width: 100%;
+        }
+
+        .hero {
+            padding: 120px 0 80px 0;
+            background: radial-gradient(circle at 50% 50%, rgba(62,198,255,0.05) 0%, rgba(100,255,218,0.05) 100%);
+        }
+
+        .hero-title {
+            font-size: 3.5em;
+            margin-bottom: 24px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #3ec6ff 0%, #64ffda 100%);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 12px 32px;
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-right: 16px;
+            transition: background 0.3s, color 0.3s;
+            box-shadow: 0 2px 8px rgba(62,198,255,0.08);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #64ffda 0%, #3ec6ff 100%);
+            color: #1a202c;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #3ec6ff;
+            border: 1.5px solid #3ec6ff;
+            border-radius: 30px;
+            padding: 12px 32px;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: #3ec6ff;
+            color: #fff;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #3ec6ff 0%, #64ffda 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+            gap: 40px;
+            justify-items: center;
+            align-items: start;
+        }
+
+        .feature-card {
+            background: #fff;
+            box-shadow: 0 2px 12px rgba(62,198,255,0.07);
+            text-align: center;
+            padding: 32px 18px 24px 18px;
+            border-radius: 18px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(62,198,255,0.12);
+        }
+
+        .feature-card > div {
+            width: 80px;
+            height: 80px;
+            background: #f1f5f9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px auto;
+        }
+
+        .feature-card i {
+            font-size: 2.5em;
+            color: #3ec6ff;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: #64748b;
+        }
+
+        .steps-timeline .step > div:first-child {
+            background: #3ec6ff;
+            color: #fff;
+        }
+
+        .steps-timeline .step h3 {
+            color: #1a202c;
+        }
+
+        .steps-timeline .step p {
+            color: #64748b;
+        }
+
+        .pricing-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 32px 24px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(62,198,255,0.07);
+            color: #1a202c;
+            border: 1px solid rgba(62,198,255,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(62,198,255,0.12);
+        }
+
+        .pricing-card h3 {
+            color: #3ec6ff;
+        }
+
+        .pricing-card ul {
+            color: #64748b;
+        }
+
+        .pricing-card .btn-primary, .pricing-card .btn-secondary {
+            margin-top: 10px;
+        }
+
+        .pricing-card[style*='background:#22304a'] {
+            background: #f1f5f9 !important;
+        }
+
+        .footer {
+            color: #64748b;
+            padding: 32px 0 16px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+    
+    <div class="noise-overlay"></div>
+    
+    <header class="main-header">
+        <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:24px 0;">
+            <a href="#" class="logo" style="display:flex;align-items:center;gap:10px;font-size:1.6em;font-weight:700;color:#00c9a7;text-decoration:none;">
+                <span class="logo-icon"><i class="fas fa-highlighter"></i></span>
+                <span class="logo-text">AnnoatPro</span>
+            </a>
+            <nav class="main-nav" style="display:flex;gap:32px;">
+                <a href="#features" class="nav-link">Fonctionnalités</a>
+                <a href="#how-it-works" class="nav-link">Comment ça marche</a>
+                <a href="#pricing" class="nav-link">Tarifs</a>
+            </nav>
+            <div class="nav-actions" style="display:flex;gap:16px;">
+                <a href="/login" class="btn-secondary">Connexion</a>
+                <a href="/register" class="btn-primary">Inscription</a>
+            </div>
+        </div>
+    </header>
+    <section class="hero" style="padding:80px 0 40px 0;text-align:center;">
+        <div class="container">
+            <h1 class="hero-title" style="font-size:2.8em;font-weight:700;line-height:1.1;">
+                <span class="gradient-text">Révolutionnez</span> votre annotation de texte
+            </h1>
+            <p class="hero-subtitle" style="font-size:1.3em;margin:24px 0 36px 0;color:#b0c4d4;">
+                Plateforme collaborative avec intelligence artificielle pour des annotations plus rapides et précises.
+            </p>
+        </div>
+    </section>
+    <section id="features" class="features" style="padding:60px 0 40px 0;">
+        <div class="container">
+            <h2 class="section-title" style="font-size:2em;font-weight:600;text-align:center;margin-bottom:32px;">Fonctionnalités <span class="gradient-text">puissantes</span></h2>
+            <div class="features-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px;justify-items:center;align-items:start;">
+                <div class="feature-card" style="background:none;box-shadow:none;text-align:center;padding:0;">
+                    <div style="width:80px;height:80px;background:#18263a;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px auto;">
+                        <i class="fas fa-robot" style="font-size:2.5em;color:#00c9a7;"></i>
+                    </div>
+                    <h3 style="margin-bottom:10px;">Assistance IA</h3>
+                    <p style="color:#b0c4d4;">Annotations automatiques et suggestions intelligentes pour accélérer votre travail.</p>
+                </div>
+                <div class="feature-card" style="background:none;box-shadow:none;text-align:center;padding:0;">
+                    <div style="width:80px;height:80px;background:#18263a;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px auto;">
+                        <i class="fas fa-users" style="font-size:2.5em;color:#00c9a7;"></i>
+                    </div>
+                    <h3 style="margin-bottom:10px;">Collaboration</h3>
+                    <p style="color:#b0c4d4;">Travaillez en équipe avec gestion des rôles et suivi en temps réel.</p>
+                </div>
+                <div class="feature-card" style="background:none;box-shadow:none;text-align:center;padding:0;">
+                    <div style="width:80px;height:80px;background:#18263a;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px auto;">
+                        <i class="fas fa-chart-line" style="font-size:2.5em;color:#00c9a7;"></i>
+                    </div>
+                    <h3 style="margin-bottom:10px;">Statistiques avancées</h3>
+                    <p style="color:#b0c4d4;">Analysez la qualité, la productivité et l'avancement de vos projets.</p>
+                </div>
+                <div class="feature-card" style="background:none;box-shadow:none;text-align:center;padding:0;">
+                    <div style="width:80px;height:80px;background:#18263a;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px auto;">
+                        <i class="fas fa-shield-alt" style="font-size:2.5em;color:#00c9a7;"></i>
+                    </div>
+                    <h3 style="margin-bottom:10px;">Sécurité & confidentialité</h3>
+                    <p style="color:#b0c4d4;">Protection des données et contrôle d'accès de niveau entreprise.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="how-it-works" class="how-it-works" style="padding:60px 0 40px 0;">
+        <div class="container">
+            <h2 class="section-title" style="font-size:2em;font-weight:600;text-align:center;margin-bottom:32px;">
+                Comment <span class="gradient-text">ça marche</span>
+            </h2>
+            <div class="steps-timeline" style="max-width:700px;margin:0 auto;">
+                <div class="step" style="display:flex;align-items:center;margin-bottom:32px;">
+                    <div style="min-width:48px;height:48px;background:#00c9a7;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5em;font-weight:700;margin-right:24px;">1</div>
+                    <div>
+                        <h3 style="margin:0 0 6px 0;">Importez vos données</h3>
+                        <p style="margin:0;color:#b0c4d4;">Chargez vos documents texte ou connectez votre source de données.</p>
+                    </div>
+                </div>
+                <div class="step" style="display:flex;align-items:center;margin-bottom:32px;">
+                    <div style="min-width:48px;height:48px;background:#00c9a7;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5em;font-weight:700;margin-right:24px;">2</div>
+                    <div>
+                        <h3 style="margin:0 0 6px 0;">Configurez le schéma d'annotation</h3>
+                        <p style="margin:0;color:#b0c4d4;">Définissez vos catégories, relations et règles de validation.</p>
+                    </div>
+                </div>
+                <div class="step" style="display:flex;align-items:center;margin-bottom:32px;">
+                    <div style="min-width:48px;height:48px;background:#00c9a7;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5em;font-weight:700;margin-right:24px;">3</div>
+                    <div>
+                        <h3 style="margin:0 0 6px 0;">Annotez avec l'IA</h3>
+                        <p style="margin:0;color:#b0c4d4;">Utilisez les suggestions de l'IA pour accélérer l'annotation.</p>
+                    </div>
+                </div>
+                <div class="step" style="display:flex;align-items:center;">
+                    <div style="min-width:48px;height:48px;background:#00c9a7;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5em;font-weight:700;margin-right:24px;">4</div>
+                    <div>
+                        <h3 style="margin:0 0 6px 0;">Validez et exportez</h3>
+                        <p style="margin:0;color:#b0c4d4;">Contrôlez la qualité et exportez vos annotations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="pricing" class="pricing" style="padding:60px 0 40px 0;">
+        <div class="container">
+            <h2 class="section-title" style="font-size:2em;font-weight:600;text-align:center;margin-bottom:32px;">Tarifs <span class="gradient-text">simples</span></h2>
+            <div class="pricing-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:36px;justify-items:center;align-items:start;">
+                <div class="pricing-card" style="background:#18263a;border-radius:18px;padding:32px 24px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.10);color:#eaf6fb;">
+                    <h3 style="font-size:1.3em;margin-bottom:10px;">Starter</h3>
+                    <div style="font-size:2.2em;font-weight:700;color:#00c9a7;margin-bottom:8px;">29€<span style="font-size:0.5em;font-weight:400;">/mois</span></div>
+                    <ul style="list-style:none;padding:0;margin:18px 0 24px 0;line-height:1.7;color:#b0c4d4;">
+                        <li>5 000 annotations/mois</li>
+                        <li>3 membres</li>
+                        <li>Assistance IA basique</li>
+                        <li>Support standard</li>
+                    </ul>
+                    <a href="/register" class="btn-primary">Commencer</a>
+                </div>
+                <div class="pricing-card" style="background:#22304a;border-radius:18px;padding:40px 24px;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,0.13);color:#eaf6fb;position:relative;">
+                    <div style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);background:#00c9a7;color:#fff;font-size:0.9em;font-weight:700;padding:4px 18px;border-radius:16px;">Populaire</div>
+                    <h3 style="font-size:1.3em;margin-bottom:10px;">Pro</h3>
+                    <div style="font-size:2.2em;font-weight:700;color:#00c9a7;margin-bottom:8px;">79€<span style="font-size:0.5em;font-weight:400;">/mois</span></div>
+                    <ul style="list-style:none;padding:0;margin:18px 0 24px 0;line-height:1.7;color:#b0c4d4;">
+                        <li>25 000 annotations/mois</li>
+                        <li>10 membres</li>
+                        <li>Assistance IA avancée</li>
+                        <li>Support prioritaire</li>
+                    </ul>
+                    <a href="/register" class="btn-primary">Essayer Pro</a>
+                </div>
+                <div class="pricing-card" style="background:#18263a;border-radius:18px;padding:32px 24px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.10);color:#eaf6fb;">
+                    <h3 style="font-size:1.3em;margin-bottom:10px;">Entreprise</h3>
+                    <div style="font-size:2.2em;font-weight:700;color:#00c9a7;margin-bottom:8px;">199€<span style="font-size:0.5em;font-weight:400;">/mois</span></div>
+                    <ul style="list-style:none;padding:0;margin:18px 0 24px 0;line-height:1.7;color:#b0c4d4;">
+                        <li>Annotations illimitées</li>
+                        <li>Membres illimités</li>
+                        <li>Assistance IA premium</li>
+                        <li>Support dédié 24/7</li>
+                    </ul>
+                    <a href="/contact" class="btn-secondary">Contactez-nous</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="cta" style="padding:60px 0 40px 0;text-align:center;">
+        <div class="container">
+            <h2 class="cta-title" style="font-size:2em;font-weight:600;">Prêt à transformer votre annotation&nbsp;?</h2>
+            <p class="cta-description" style="color:#b0c4d4;margin:18px 0 32px 0;">Essayez AnnoatPro gratuitement et rejoignez la nouvelle génération de l'annotation intelligente.</p>
+            <a href="/register" class="btn-primary">Démarrer gratuitement</a>
+        </div>
+    </section>
+    
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <a href="#" class="logo">
+                        <span class="logo-icon">🔍</span>
+                        <span class="logo-text">AnnoatPro</span>
+                    </a>
+                    <p class="brand-description">
+                        Revolutionizing text annotation with AI-powered collaboration tools
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <div class="link-group">
+                        <h4 class="group-title">Product</h4>
+                        <ul>
+                            <li><a href="#">Features</a></li>
+                            <li><a href="#">Pricing</a></li>
+                            <li><a href="#">Integrations</a></li>
+                            <li><a href="#">Changelog</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="link-group">
+                        <h4 class="group-title">Resources</h4>
+                        <ul>
+                            <li><a href="#">Documentation</a></li>
+                            <li><a href="#">API Reference</a></li>
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Community</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="link-group">
+                        <h4 class="group-title">Company</h4>
+                        <ul>
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Careers</a></li>
+                            <li><a href="#">Contact</a></li>
+                            <li><a href="#">Partners</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="link-group">
+                        <h4 class="group-title">Legal</h4>
+                        <ul>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="#">Cookie Policy</a></li>
+                            <li><a href="#">GDPR</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2025 AnnoatPro. Tous droits réservés.</p>
+                <div class="language-selector">
+                    <select>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+    <script src="/js/index.js"></script>
+</body>
+</html>

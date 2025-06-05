@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Annotateur - Annotations App</title>
+    <link rel="stylesheet" href="/css/custom.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/add_annotateur.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar('users')}"></div>
+<div th:replace="~{fragments/navbar :: navbar('Add New Annotateur')}"></div>
+
+<main class="main-content">
+    <div class="form-container">
+        <div class="form-header">
+            <h1 class="form-title">Add New Annotateur</h1>
+            <p class="form-subtitle">Create a new annotateur account to access the annotation system</p>
+        </div>
+
+        <div class="form-body">
+            <!-- Alert messages from controller -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <i class='bx bx-check-circle'></i>
+                <span th:text="${successMessage}">Success message</span>
+            </div>
+
+            <div th:if="${errorMessage}" class="alert alert-error">
+                <i class='bx bx-error-circle'></i>
+                <span th:text="${errorMessage}">Error message</span>
+            </div>
+
+            <form th:action="@{/admin/annotateurs/save}" method="post" id="annotateurForm" th:object="${user}">
+                <!-- Hidden field for updates -->
+                <input type="hidden" th:field="*{id}" />
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class='bx bx-user-circle'></i> Personal Information
+                    </h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="prenom" class="form-label form-label-required">First Name</label>
+                            <div class="input-icon-wrapper">
+                                <i class='bx bx-user input-icon'></i>
+                                <input type="text" id="prenom" name="prenom" th:field="*{prenom}" class="form-control input-with-icon" placeholder="Enter first name" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nom" class="form-label form-label-required">Last Name</label>
+                            <div class="input-icon-wrapper">
+                                <i class='bx bx-user input-icon'></i>
+                                <input type="text" id="nom" name="nom" th:field="*{nom}" class="form-control input-with-icon" placeholder="Enter last name" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class='bx bx-lock-alt'></i> Authentication Information
+                    </h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="login" class="form-label form-label-required">Username</label>
+                            <div class="input-icon-wrapper">
+                                <i class='bx bx-at input-icon'></i>
+                                <input type="text" id="login" name="login" th:field="*{login}" class="form-control input-with-icon" placeholder="Create username" required>
+                            </div>
+                            <div class="form-helper mb-7">This username will be used for login</div>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="email" class="form-label form-label-required">Email</label>
+                            <div class="input-icon-wrapper">
+                                <i class='bx bx-at input-icon'></i>
+                                <input type="email"
+                                       id="email"
+                                       th:field="*{email}"
+                                       class="form-control input-with-icon"
+                                       placeholder="Enter email"
+                                       required />
+                            </div>
+                            <div class="form-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tips-card">
+                    <div class="tips-title">
+                        <i class='bx bx-bulb'></i>
+                        <span>Important Information</span>
+                    </div>
+                    <ul class="tips-list">
+                        <li>
+                            <i class='bx bx-check'></i>
+                            <span>Username must be unique and will be used for login authentication</span>
+                        </li>
+                        <li>
+                            <i class='bx bx-check'></i>
+                            <span>The new annotateur will be active immediately after creation</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class='bx bx-user-plus'></i>
+                        <span th:text="${user.id != null ? 'Update Annotateur' : 'Create Annotateur'}">Create Annotateur</span>
+                    </button>
+
+                    <a href="/admin/annotateurs" class="btn btn-secondary">
+                        <i class='bx bx-arrow-back'></i>
+                        <span>Cancel</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

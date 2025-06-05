@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/custom.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+</head>
+<body>
+<div th:replace="~{fragments/user_sidebar :: sidebar('dashboard')}"></div>
+<div th:replace="~{fragments/user_navbar :: navbar('User Dashboard')}"></div>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="content-header">
+        <h2 class="content-title">Annotator Dashboard</h2>
+        <p class="content-subtitle">View and manage your annotation tasks</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-card-icon">
+                <i class='bx bx-task'></i>
+            </div>
+            <div th:text="${pendingTasksCount}" class="stat-card-value">5</div>
+            <div class="stat-card-label">Pending Tasks</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon">
+                <i class='bx bx-check-circle'></i>
+            </div>
+            <div th:text="${completedTasksCount}" class="stat-card-value">12</div>
+            <div class="stat-card-label">Completed Tasks</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon">
+                <i class='bx bx-time'></i>
+            </div>
+            <div th:text="${urgentTasksCount}" class="stat-card-value">2</div>
+            <div class="stat-card-label">Urgent Tasks</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon">
+                <i class='bx bx-trending-up'></i>
+            </div>
+            <div th:text="${accuracyRate}" class="stat-card-value">94.2%</div>
+            <div class="stat-card-label">Accuracy Rate</div>
+        </div>
+    </div>
+
+    <!-- Main Cards -->
+    <div class="main-cards">
+        <div class="card">
+            <a th:href="@{/user/tasks}">
+                <div class="card-decoration"></div>
+                <div class="card-icon">
+                    <i class='bx bx-task'></i>
+                </div>
+                <h3 class="card-title">My Tasks</h3>
+                <p class="card-description">View and complete your assigned annotation tasks. Track your progress and deadlines.</p>
+                <div class="card-action">
+                    <span>View Tasks</span>
+                    <i class='bx bx-right-arrow-alt'></i>
+                </div>
+            </a>
+        </div>
+
+        <div class="card">
+            <a th:href="@{/user/history}">
+                <div class="card-decoration"></div>
+                <div class="card-icon">
+                    <i class='bx bx-history'></i>
+                </div>
+                <h3 class="card-title">Annotation History</h3>
+                <p class="card-description">Review your previous annotations, track your performance, and see detailed statistics.</p>
+                <div class="card-action">
+                    <span>View History</span>
+                    <i class='bx bx-right-arrow-alt'></i>
+                </div>
+            </a>
+        </div>
+
+        <div class="card">
+            <a th:href="@{/user/profile}">
+                <div class="card-decoration"></div>
+                <div class="card-icon">
+                    <i class='bx bx-user'></i>
+                </div>
+                <h3 class="card-title">My Profile</h3>
+                <p class="card-description">Manage your account information, update your preferences, and track your achievements.</p>
+                <div class="card-action">
+                    <span>View Profile</span>
+                    <i class='bx bx-right-arrow-alt'></i>
+                </div>
+            </a>
+        </div>
+    </div>
+</main>
+
+<script src="/js/dashboard.js"></script>
+</body>
+</html>

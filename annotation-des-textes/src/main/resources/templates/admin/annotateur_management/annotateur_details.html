@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annotator Details - Annotations App</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/custom.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .annotator-details-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .details-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .details-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .annotator-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-info h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .header-info .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .header-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-card, .stats-overview {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f1f5f9;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .card-title i {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .profile-field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .profile-field:last-child {
+            border-bottom: none;
+        }
+
+        .field-label {
+            font-weight: 600;
+            color: #64748b;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .field-value {
+            font-weight: 600;
+            color: #1e293b;
+            text-align: right;
+        }
+
+        .role-badge {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .activity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        .activity-dot.inactive {
+            background: #94a3b8;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tasks-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f1f5f9;
+        }
+
+        .tasks-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .tasks-table th {
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+            color: #475569;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .tasks-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .tasks-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .task-id {
+            font-weight: 700;
+            color: #667eea;
+            background: #f0f4ff;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .dataset-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .deadline-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .deadline-badge.upcoming {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .deadline-badge.overdue {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .deadline-badge.none {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .couples-count {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .couples-count i {
+            color: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .annotator-details-container {
+                padding: 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-actions {
+                margin-left: 0;
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tasks-table {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar('users')}"></div>
+<div th:replace="~{fragments/navbar :: navbar('Annotator Details')}"></div>
+
+<main class="main-content">
+    <div class="annotator-details-container">
+        <!-- Error Messages -->
+        <div th:if="${errorMessage}" class="alert alert-error">
+            <i class='bx bx-error-circle'></i>
+            <span th:text="${errorMessage}">Error message</span>
+        </div>
+
+        <!-- Header Section -->
+        <div class="details-header">
+            <div class="header-content">
+                <div class="annotator-avatar" th:text="${#strings.substring(annotateur.prenom, 0, 1) + #strings.substring(annotateur.nom, 0, 1)}">JD</div>
+                <div class="header-info">
+                    <h1 th:text="${annotateur.prenom + ' ' + annotateur.nom}">John Doe</h1>
+                    <p class="subtitle" th:text="${annotateur.email}">john.doe@example.com</p>
+                </div>
+                <div class="header-actions">
+                    <a th:href="@{'/admin/annotateurs/update/' + ${annotateur.id}}" class="btn-primary">
+                        <i class='bx bx-edit-alt'></i>
+                        Edit Profile
+                    </a>
+                    <a th:href="@{/admin/annotateurs}" class="btn-secondary">
+                        <i class='bx bx-arrow-back'></i>
+                        Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Profile Card -->
+            <div class="profile-card">
+                <h2 class="card-title">
+                    <i class='bx bx-user-circle'></i>
+                    Profile Information
+                </h2>
+
+                <div class="profile-field">
+                    <span class="field-label">Full Name</span>
+                    <span class="field-value" th:text="${annotateur.prenom + ' ' + annotateur.nom}">John Doe</span>
+                </div>
+
+                <div class="profile-field">
+                    <span class="field-label">Email Address</span>
+                    <span class="field-value" th:text="${annotateur.email}">john.doe@example.com</span>
+                </div>
+
+                <div class="profile-field">
+                    <span class="field-label">Username</span>
+                    <span class="field-value" th:text="${annotateur.login}">johndoe</span>
+                </div>
+
+                <div class="profile-field">
+                    <span class="field-label">Role</span>
+                    <span class="field-value">
+                        <span class="role-badge" th:text="${annotateur.role.role}">USER_ROLE</span>
+                    </span>
+                </div>
+
+                <div class="profile-field">
+                    <span class="field-label">Status</span>
+                    <span class="field-value">
+                        <div class="activity-status">
+                            <div class="activity-dot" th:classappend="${latestProgress == null} ? 'inactive' : ''"></div>
+                            <span th:if="${latestProgress != null}">Active</span>
+                            <span th:unless="${latestProgress != null}">Inactive</span>
+                        </div>
+                    </span>
+                </div>
+
+                <div class="profile-field">
+                    <span class="field-label">Last Activity</span>
+                    <span class="field-value">
+                        <span th:if="${latestProgress != null}" th:text="${#temporals.format(latestProgress.derniereMiseAJour, 'MMM dd, yyyy HH:mm')}">Jan 15, 2024 14:30</span>
+                        <span th:unless="${latestProgress != null}" style="color: #94a3b8; font-style: italic;">No activity yet</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Statistics Overview -->
+            <div class="stats-overview">
+                <h2 class="card-title">
+                    <i class='bx bx-bar-chart-alt-2'></i>
+                    Performance Overview
+                </h2>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${totalTasks}">0</div>
+                        <div class="stat-label">Total Tasks</div>
+                    </div>
+
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${completedTasks}">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${activeTasks}">0</div>
+                        <div class="stat-label">Active</div>
+                    </div>
+
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${totalAnnotations}">0</div>
+                        <div class="stat-label">Annotations</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks Section -->
+        <div class="tasks-section">
+            <h2 class="card-title">
+                <i class='bx bx-list-ul'></i>
+                Assigned Tasks
+            </h2>
+
+            <div th:if="${tasks.isEmpty()}" class="empty-state">
+                <i class='bx bx-task-x'></i>
+                <h3>No Tasks Assigned</h3>
+                <p>This annotator has no tasks assigned yet.</p>
+            </div>
+
+            <div th:unless="${tasks.isEmpty()}">
+                <table class="tasks-table">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Dataset</th>
+                            <th>Deadline</th>
+                            <th>Text Pairs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="task : ${tasks}">
+                            <td>
+                                <span class="task-id" th:text="'#' + ${task.id}">1</span>
+                            </td>
+                            <td>
+                                <span class="dataset-name" th:text="${task.dataset.name}">Dataset Name</span>
+                            </td>
+                            <td>
+                                <span th:if="${task.dateLimite != null}"
+                                      class="deadline-badge"
+                                      th:classappend="${task.dateLimite.before(new java.util.Date())} ? 'overdue' : 'upcoming'"
+                                      th:text="${#dates.format(task.dateLimite, 'MMM dd, yyyy')}">Dec 31, 2024</span>
+                                <span th:unless="${task.dateLimite != null}" class="deadline-badge none">No deadline</span>
+                            </td>
+                            <td>
+                                <div class="couples-count">
+                                    <i class='bx bx-text'></i>
+                                    <span th:text="${task.couples.size()} + ' pairs'">10 pairs</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth animations
+    const cards = document.querySelectorAll('.profile-card, .stats-overview, .tasks-section');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 150);
+    });
+
+    // Add hover effects to buttons
+    const buttons = document.querySelectorAll('.btn-primary, .btn-secondary');
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Add click animation to stat items
+    const statItems = document.querySelectorAll('.stat-item');
+    statItems.forEach(item => {
+        item.addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+        });
+    });
+});
+</script>
+</body>
+</html>
