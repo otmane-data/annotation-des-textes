@@ -117,10 +117,4 @@ src/main/java/com/otmane/annotation_des_textes/
 3. Sélectionnez une tâche active
 4. Pour chaque paire de textes, choisissez la classe appropriée
 
-## 📝 Licence
 
-[Insérer informations de licence]
-
-## 📧 Contact
-
-[Insérer informations de contact]
